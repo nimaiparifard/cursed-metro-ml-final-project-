@@ -16,8 +16,8 @@ Beheshti = 'Beheshti'
 Heravi = 'Heravi'
 Ghaem = 'Ghaem'
 Azadi = 'Azadi'
-Pherdosi = 'Pherdosi'
-Shermiran = 'Shermiran'
+Ferdowsi = 'ferdowsi'
+Shemiran = 'Shemiran'
 Booali = 'Booali'
 ############################################################################################
 
@@ -25,7 +25,7 @@ Booali = 'Booali'
 Line1 = [Tajrish, Shariati, Beheshti,Dowlat, Mohamadieh, Kahrizak]
 Line2 = [Sanat, Valiasr, Theather, Mohamadieh, Heravi, Basij]
 Line3 = [Sattari, Valiasr, Jahad, Beheshti, Heravi, Ghaem]
-Line4 = [Azadi, Theather, Pherdosi, Dowlat, Shermiran, Booali]
+Line4 = [Azadi, Theather, Ferdowsi, Dowlat, Shemiran, Booali]
 ###########################################################################################
 
 
