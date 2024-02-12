@@ -16,18 +16,18 @@ class Metro:
         
         # Common and Normal Stations (defined in reverse order to correctly assign children)
         # Line 1
-        mohammadiye = Station(Mohamadieh, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[kahrizak])
-        dowlat = Station(Dowlat, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[mohammadiye])
+        mohammadiye = Station(Mohamadieh, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[kahrizak], crowed_station=True)
+        dowlat = Station(Dowlat, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[mohammadiye], crowed_station=True)
         beheshti = Station(Beheshti, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[dowlat])  # Shared with Line 3
         shariati = Station(Shariati, input_rate_range=(10, 14), output_rate_range=(8, 12), children=[beheshti])
-        tajrish = Station(Tajrish, input_rate_range=(30, 40), output_rate_range=(0, 0), children=[shariati], is_first_station=True)
+        tajrish = Station(Tajrish, input_rate_range=(30, 40), output_rate_range=(0, 0), children=[shariati], is_first_station=True, crowed_station=True)
         
         # Line 2
         molavi = Station(Molavi, input_rate_range=(10, 14), output_rate_range=(8, 12), children=[basij])
         # Mohammadiye already defined, add Molavi as a child
         mohammadiye.children.append(molavi)
-        teatr = Station(Theather, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[mohammadiye])  # Shared with Line 4
-        valiasr = Station(Valiasr, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[teatr])  # Shared with Line 3
+        teatr = Station(Theather, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[mohammadiye], crowed_station=True)  # Shared with Line 4
+        valiasr = Station(Valiasr, input_rate_range=(10, 14), output_rate_range=(15, 20), children=[teatr], crowed_station=True)  # Shared with Line 3
         sanat = Station(Sanat, input_rate_range=(30, 40), output_rate_range=(0, 0), children=[valiasr], is_first_station=True)
         
         # Line 3
@@ -115,15 +115,26 @@ class Metro:
             # Loop through each line in sequence
             for line_name, stations in self.lines.items():  # Assuming self.lines is defined in __init__
                 print(f"Processing {line_name}")  # Placeholder for line processing
-                
+                current_passenger = 0
+                line_timestamp = timestamp
                 for station_name in stations:
                     station = self.stations[station_name]
+                    station.set_current_in_train_passenger(current_passenger)
+                    station.set_line_number_rate(line_name)
+                    station.set_crowed_station_rate()
+                    station.set_crowed_time_rate(timestamp)
+                    station.is_holiday(0)
+                    station.is_weekend(0)
+                    station.generate_input_rate()
+                    station.generate_output_rate()
+                    current_passenger = current_passenger + station.input_rate - station.output_rate
                     # Simulate passenger flow at this station
                     station.passengers_flow(timestamp)
+                    line_timestamp += datetime.timedelta(minutes=6)
                     print(f"Simulated passengers flow at {station.name}")  # Placeholder for actual simulation
                     
             # Increment timestamp by 6 minutes
-            timestamp += datetime.timedelta(minutes=6)
+            timestamp += datetime.timedelta(minutes=30)
             
         print("Simulation complete.")
 
