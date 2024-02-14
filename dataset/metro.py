@@ -4,6 +4,7 @@ import datetime
 import matplotlib.pyplot as plt
 import networkx as nx
 from dataset.stations import *
+import pandas as pd
 class Metro:
     def __init__(self) -> None:
         self.stations_list = []
@@ -103,96 +104,61 @@ class Metro:
         # Start time: 6 AM on 1st Jan 2024
         start_time = datetime.datetime(2024, 1, 1, 6, 0)
         # End time: 10 PM on the same day
-        end_time = datetime.datetime(2024, 1, 1, 22, 0)
-        
-        # Current simulation time
-        timestamp = start_time
-        
-        while timestamp <= end_time:
-            print(f"Simulating for Weekday time: {timestamp}")  # Placeholder for simulation steps
-            
-            # Loop through each line in sequence
-            for line_name, stations in self.lines.items():  # Assuming self.lines is defined in __init__
-                print(f"Processing {line_name}")  # Placeholder for line processing
-                current_passenger = 0
-                line_timestamp = timestamp
-                for station_name in stations:
-                    station = self.stations[station_name]
-                    self.simulate_station_process(station, current_passenger, line_name, line_timestamp, 0, 0)
-                    current_passenger = station.current_in_train_passenger
-                    line_timestamp += datetime.timedelta(minutes=6)
-                    print(f"Simulated passengers flow at {station.name}")  # Placeholder for actual simulation
-                    
-            # Increment timestamp by 6 minutes
-            timestamp += datetime.timedelta(minutes=30)
-
-        # Start time: 6 AM on 1st Jan 2024
-        start_time = datetime.datetime(2024, 1, 1, 6, 0)
-        # End time: 10 PM on the same day
-        end_time = datetime.datetime(2024, 1, 1, 22, 0)
+        end_time = datetime.datetime(2024, 1, 1, 21, 30)
 
         # Current simulation time
         timestamp = start_time
-
+        train_number = 0
         while timestamp <= end_time:
             print(f"Simulating for Holiday time: {timestamp}")  # Placeholder for simulation steps
 
             # Loop through each line in sequence
+            train_number += 1
             for line_name, stations in self.lines.items():  # Assuming self.lines is defined in __init__
                 print(f"Processing {line_name}")  # Placeholder for line processing
                 current_passenger = 0
                 line_timestamp = timestamp
                 for station_name in stations:
+                    station_number_in_line, line_number = self.get_station_number_in_line(station_name, line_name)
+                    train_number_ = str(line_number) + "_" + str(train_number)
                     station = self.stations[station_name]
-                    self.simulate_station_process(station, current_passenger, line_name, line_timestamp, 1, 0)
-                    current_passenger = station.current_in_train_passenger
+                    current_passenger = self.simulate_station_process(station,line_name, line_timestamp,train_number_, current_passenger, 0, 0)
                     line_timestamp += datetime.timedelta(minutes=6)
                     print(f"Simulated passengers flow at {station.name}")  # Placeholder for actual simulation
 
             # Increment timestamp by 6 minutes
-            timestamp += datetime.timedelta(minutes=30)
+            timestamp += datetime.timedelta(minutes=6)
 
-        # Start time: 6 AM on 1st Jan 2024
-        start_time = datetime.datetime(2024, 1, 1, 6, 0)
-        # End time: 10 PM on the same day
-        end_time = datetime.datetime(2024, 1, 1, 22, 0)
+    def get_train_number_in_line(self, timestamp, station_number_in_line):
+        train_status_dataset = pd.read_csv('train_status.csv')
+        t = train_status_dataset.loc[(train_status_dataset['next_station' == timestamp]) &
+                                     (train_status_dataset['next_station_time_arrived'] == station_number_in_line)]
+        return t.train_number.item(), t.current_passenger.item()
+    def get_station_number_in_line(self, station_name, line_name):
+        if line_name == 'Line1':
+            station_number = Line1.index(station_name)
+            return station_number + 1, 1
+        elif line_name == 'Line2':
+            station_number = Line2.index(station_name)
+            return station_number + 1, 2
+        elif line_name == 'Line3':
+            station_number = Line3.index(station_name)
+            return station_number + 1, 3
+        else:
+            station_number = Line4.index(station_name)
+            return station_number + 1, 4
 
-        # Current simulation time
-        timestamp = start_time
-
-        while timestamp <= end_time:
-            print(f"Simulating for Weekend time: {timestamp}")  # Placeholder for simulation steps
-
-            # Loop through each line in sequence
-            for line_name, stations in self.lines.items():  # Assuming self.lines is defined in __init__
-                print(f"Processing {line_name}")  # Placeholder for line processing
-                current_passenger = 0
-                line_timestamp = timestamp
-                for station_name in stations:
-                    station = self.stations[station_name]
-                    self.simulate_station_process(station, current_passenger, line_name, line_timestamp, 0, 1)
-                    current_passenger = station.current_in_train_passenger
-                    line_timestamp += datetime.timedelta(minutes=6)
-                    print(f"Simulated passengers flow at {station.name}")  # Placeholder for actual simulation
-
-            # Increment timestamp by 6 minutes
-            timestamp += datetime.timedelta(minutes=30)
-            
-        print("Simulation complete.")
-
-
-    def simulate_station_process(self, station, current_passenger, line_name, timestamp, is_holiday, is_weekend):
-        station.set_current_in_train_passenger(current_passenger)
+    def simulate_station_process(self, station, line_name, timestamp, train_number, current_passengers, is_holiday, is_weekend):
         station.set_line_number_rate(line_name)
         station.set_crowed_station_rate()
         station.set_crowed_time_rate(timestamp)
         station.is_holiday(0)
         station.is_weekend(0)
         station.generate_input_rate()
-        station.generate_output_rate()
-        station.passengers_flow(timestamp)
-        current_passenger = station.current_in_train_passenger
+        station.generate_output_rate(current_passengers)
+        current_passenger = station.passengers_flow(timestamp, train_number, current_passengers)
         return current_passenger
+
 
 cursed_metro = Metro()
 # cursed_metro.create_metro_graph()
