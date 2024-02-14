@@ -4,12 +4,10 @@ from stations import *
 import datetime
 import csv
 
+# Creating train_status_creation.csv that information of each train in each time
 def creating_train_status_dataset():
     start_time = datetime.datetime(2024, 1, 1, 6, 0)
-    # End time: 10 PM on the same day
     end_time = datetime.datetime(2024, 1, 1, 21, 30)
-
-    # Current simulation time
     timestamp = start_time
     train_number = 0
 
@@ -24,7 +22,6 @@ def creating_train_status_dataset():
             line_timestamp = timestamp
             for station_name in stations:
                 station_number_in_line, line_number = get_station_number_in_line(station_name, line_name)
-                # if station_number_in_line == 1:
                 train_number_ = str(line_number) + "_" + str(train_number)
                 next_station_arrived =line_timestamp + datetime.timedelta(minutes=6)
                 next_station = station_number_in_line + 1

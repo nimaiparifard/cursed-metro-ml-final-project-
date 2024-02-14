@@ -75,13 +75,6 @@ class Station:
             logging.info(f'the output (leaving the metro) from the station {self.name} is : {output_rate}')
         self.output_rate = output_rate
 
-
-    def passenger_departed(self): # this function have to be very carefully executed because it has to be after the other functions ...
-        if len(self.children) > 1:
-            for child in self.children:
-                child.passengers += int(self.passengers / len(self.children)) # the currnet (remaining) passengers are divided by the number of possible next station
-            self.passengers = 0
-
     def passengers_flow(self, timestamp, train_number, current_passenger):
         change_line_passengers = self.passengers
         print(f'passenger flow started for {self.name}')
@@ -89,10 +82,9 @@ class Station:
 
         # step 2: the passengers which leaves the metro through this station ....
         self.passengers -= self.output_rate
+        current_passenger = int((current_passenger + self.passengers) / len(self.children))
         if len(self.children) > 1:
-            output_flow = int(self.output_rate / len(self.children))
-        output_flow = self.output_rate
-        current_passenger = current_passenger + self.input_rate - output_flow
+            current_passenger = int((current_passenger + self.passengers) / len(self.children))
         if self.is_last_station:
             current_passenger = 0
         format = '%Y-%m-%d %H:%M:%S'
@@ -110,6 +102,4 @@ class Station:
             # Write the data row
             writer.writerow([timestamp, self.name, self.input_rate, self.output_rate, self.line_number, self.crowed_rate, self.crowed_station, self.weekend, self.holiday])
 
-        # step 3: the passengers will then be divided by the possible number of stations and ....
-        self.passenger_departed()
         return current_passenger

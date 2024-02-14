@@ -67,38 +67,6 @@ class Metro:
             'Line4' : Line4
         }
 
-    def create_metro_graph(self):
-        metro_structure = {
-            Kahrizak: [],
-            Basij: [],
-            Ghaem: [],
-            Booali: [],
-            Mohamadieh: [Kahrizak, Molavi],
-            Dowlat: [Mohamadieh],
-            Beheshti: [Dowlat, Heravi],
-            Shariati: [Beheshti],
-            Tajrish: [Shariati],
-            Molavi: [Basij],
-            Theather: [Mohamadieh, Ferdowsi],
-            Valiasr: [Theather, Jahad],
-            Sanat: [Valiasr],
-            Heravi: [Ghaem],
-            Jahad: [Beheshti],
-            Sattari: [Valiasr],
-            Shemiran: [Booali],
-            Ferdowsi: [Shemiran],
-            Azadi: [Theather],
-        }
-        # Create a directed graph from the metro structure
-        G = nx.DiGraph(metro_structure)
-        pos = nx.rescale_layout(G, scale=1)
-        plt.figure(figsize=(18, 10))
-        nx.draw(G, pos, with_labels=True, node_size=2500, node_color='skyblue', font_size=10, font_weight='bold', arrowstyle='-|>', arrowsize=12)
-        plt.title('Metro Station Structure (Improved Layout)')
-        plt.axis('off')  # Turn off the axis for a cleaner look
-        plt.show()
-
-
 
     def metro_simulation_one_day(self):
         # Start time: 6 AM on 1st Jan 2024
